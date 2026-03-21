@@ -1,0 +1,5 @@
+*.db
+*.zip
+__pycache__/
+*.pyc
+.claude/
