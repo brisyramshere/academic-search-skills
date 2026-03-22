@@ -11,7 +11,7 @@ Search PubMed via NCBI E-utilities API (ESearch + EFetch). Results are cached in
 
 **Python**: `python3` (fallback: ask user for path if not found)
 
-```bash
+```
 # Basic search
 python3 <skill_path>/scripts/pubmed_search.py --query "your search terms" --max 20
 
@@ -34,6 +34,19 @@ python3 <skill_path>/scripts/pubmed_search.py --query "..." --format markdown
 python3 <skill_path>/scripts/pubmed_search.py --query "..." --api-key YOUR_KEY
 ```
 
+## Shell Compatibility
+
+**IMPORTANT**: The `--query` value may contain brackets, quotes, and special characters that are interpreted differently across shells. You MUST follow these rules when generating commands:
+
+- On **PowerShell (Windows)**: Always wrap `--query` value in **single quotes**. Single quotes in PowerShell prevent ALL special character interpretation.
+  ```powershell
+  python3 <skill_path>/scripts/pubmed_search.py --query 'brain tumor surgical navigation' --max 20
+  python3 <skill_path>/scripts/pubmed_search.py --query 'brain tumor[MeSH] AND surgery[tiab]' --max 20
+  ```
+- On **Bash / Zsh (Linux/macOS)**: Use double quotes as shown in Usage examples above.
+- **Prefer plain keyword queries** (no field tags, no brackets) whenever the search intent is straightforward — they work identically on all shells.
+- **Never nest quotes** inside the query string. Do NOT generate `--query "\"exact phrase\"[tiab]"` — use `--query 'exact phrase[tiab]'` on PowerShell or `--query "exact phrase[tiab]"` on Bash instead.
+
 ## Parameters
 
 | Param | Description |
@@ -50,11 +63,16 @@ python3 <skill_path>/scripts/pubmed_search.py --query "..." --api-key YOUR_KEY
 
 ## Query Syntax
 
+Simple keywords work best and avoid shell escaping issues:
 ```
-term1 AND term2                      # both required
-term1 OR term2                       # either
+brain tumor surgical navigation       # plain keywords (recommended, most compatible)
+term1 AND term2                       # boolean operators are safe on all shells
+```
+
+Advanced syntax (wrap in single quotes on PowerShell):
+```
 term1 NOT term2                      # exclude
-"exact phrase"[tiab]                 # title + abstract
+exact phrase[tiab]                   # title + abstract (no quotes needed around phrase)
 keyword[MeSH]                        # MeSH term
 author_name[Author]                  # author
 journal_name[Journal]                # journal

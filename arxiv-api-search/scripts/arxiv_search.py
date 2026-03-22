@@ -62,12 +62,14 @@ def init_db():
 
 
 def safe_request(url, max_retries=3):
-    """Execute HTTP request with retry and exponential backoff"""
+    """Execute HTTP request with retry and exponential backoff (bypasses system proxy)"""
     ctx = ssl.create_default_context()
     req = urllib.request.Request(url, headers={'User-Agent': 'arxiv-skill/1.0'})
     for attempt in range(max_retries):
         try:
-            with urllib.request.urlopen(req, timeout=30, context=ctx) as response:
+            proxy_handler = urllib.request.ProxyHandler({})
+            opener = urllib.request.build_opener(proxy_handler)
+            with opener.open(req, timeout=30) as response:
                 return response.read().decode('utf-8')
         except Exception as e:
             if attempt == max_retries - 1:

@@ -11,7 +11,7 @@ Search arXiv via API. Results are cached in SQLite for offline re-query.
 
 **Python**: `python3` (fallback: ask user for path if not found)
 
-```bash
+```
 # Basic search
 python3 <skill_path>/scripts/arxiv_search.py --query "your search terms" --max 20
 
@@ -31,6 +31,19 @@ python3 <skill_path>/scripts/arxiv_search.py --db-query "keyword"
 python3 <skill_path>/scripts/arxiv_search.py --query "..." --format markdown
 ```
 
+## Shell Compatibility
+
+**IMPORTANT**: The `--query` value may contain parentheses and special characters that are interpreted differently across shells. You MUST follow these rules when generating commands:
+
+- On **PowerShell (Windows)**: Always wrap `--query` value in **single quotes**. Single quotes in PowerShell prevent ALL special character interpretation.
+  ```powershell
+  python3 <skill_path>/scripts/arxiv_search.py --query 'deep learning surgical navigation' --max 20
+  python3 <skill_path>/scripts/arxiv_search.py --query 'cat:(cs.RO) AND all:(navigation)' --max 20
+  ```
+- On **Bash / Zsh (Linux/macOS)**: Use double quotes as shown in Usage examples above.
+- **Prefer plain keyword queries** (no field prefixes, no parentheses) whenever the search intent is straightforward — they work identically on all shells.
+- **Never nest quotes** inside the query string. Do NOT generate `--query "ti:(\"some phrase\")"` — use `--query 'ti:(some phrase)'` on PowerShell or `--query "ti:(some phrase)"` on Bash instead.
+
 ## Parameters
 
 | Param | Description |
@@ -46,8 +59,14 @@ python3 <skill_path>/scripts/arxiv_search.py --query "..." --format markdown
 
 ## Query Syntax
 
+Simple keywords work best and avoid shell escaping issues:
 ```
-all:(keyword1 OR keyword2)           # search title + abstract (recommended)
+deep learning surgical navigation     # plain keywords (recommended, most compatible)
+```
+
+Advanced syntax (wrap in single quotes on PowerShell):
+```
+all:(keyword1 OR keyword2)           # search title + abstract
 ti:(exact title phrase)              # title only
 cat:(cs.RO) AND all:(navigation)     # category + keyword
 au:(Smith) AND ti:(robot)            # author + title
